@@ -97,8 +97,9 @@ main(void){
 #endif // LIGHT_SENSOR
     serial_init();
     sei();
-    if (LIGHT_SENSOR_COUNT <= 0 && DHT_SENSOR_COUNT <= 0 && TEMP_SENSOR_COUNT <= 0) {
-        sprintf(buf, "No sensors installed, operation will now halt\r\n");
+    if (LIGHT_SENSOR_COUNT <= 0 && DHT_SENSOR_COUNT <= 0
+        && TEMP_SENSOR_COUNT <= 0 && ACTUATOR_COUNT <= 0) {
+        sprintf(buf, "No sensors or actuators installed, operation will now halt\r\n");
         S_PUTS(buf, 0);
         for(;;);
     }

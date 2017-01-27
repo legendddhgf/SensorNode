@@ -1,5 +1,6 @@
 PROGRAMMER=avrdude
 LINPORT=/dev/ttyACM0
+LINPORT=/dev/ttyS0
 MACPORT=/dev/tty.usbmodem1421
 WINPORT=COM3
 CC=avr-gcc
@@ -115,4 +116,5 @@ ifndef PROGRAMMER_PATH
 	$(error "OS not configured in makefile: $(UNAME)")
 	exit 1
 endif
-	$(PROGRAMMER) -P $(PROGRAMMER_PATH) -p $(MCU) -c stk500v2 -e -b 115200 -U flash:w:$(TARGET).hex
+	$(PROGRAMMER) -P $(PROGRAMMER_PATH) -p $(MCU) \
+		-c stk500v2 -b 115200 -U flash:w:$(TARGET).hex -D
