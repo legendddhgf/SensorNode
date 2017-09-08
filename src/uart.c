@@ -167,12 +167,13 @@ ISR(USART1_UDRE_vect) { // If this interrupt is enabled, we still need to do TX
 }
 
 // function to initialize UART
+// FIXME hardcoded to have 8 bit data, no parity, two stop bits
 void uart1_init (uint16_t baudrate) {
   UBRR1H = (BAUD_PRESCALE(baudrate) >> 8) & 0xFF;	// get the upper 8 bits
   UBRR1L = BAUD_PRESCALE(baudrate) & 0xFF;  // get the lower 8 bits
   UCSR1B |= _BV(TXEN1) | _BV(RXEN1);	// enable receiver and transmitter
   UCSR1B |= _BV(RXCIE1); // enable receive interrupt
-  UCSR1C |= _BV(UCSZ11) | _BV(UCSZ10); // 8 data bits
+  UCSR1C |= _BV(UCSZ11) | _BV(UCSZ10) | _BV(USBS1); // 8 data, 2 stop
 
   RXhead1 = RXtail1 = 0; // start it at first location
   TXhead1 = TXtail1 = 0; // start it at first location

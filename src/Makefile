@@ -9,7 +9,7 @@ TARGET=main
 OBJCOPY=avr-objcopy
 RM=rm -f
 F_CPU=16000000UL
-CDEFS=-DF_CPU=$(F_CPU) -DUSING_UART3
+CDEFS=-DF_CPU=$(F_CPU) -DUSING_UART3 -DUSING_UART1
 # TODO: is this being used anymore?
 ifdef NORADIO
 	CDEFS+=-DNORADIO
@@ -41,7 +41,7 @@ CFLAGS+=-O$(OPT)
 LDFLAGS+=-O$(OPT)
 
 MODULES = main parser uart module actuator OneWire fona current_sensor
-MODULES += twimaster humidity_sensor light_sensor can_bus extra_util
+MODULES += twimaster humidity_sensor light_sensor can_bus tsmppt extra_util
 OBJECTS = $(MODULES:%=%.o)
 
 ######## OS Detection #########
