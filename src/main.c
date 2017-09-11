@@ -15,6 +15,7 @@
 #include "light_sensor.h"
 #include "humidity_sensor.h"
 #include "fona.h"
+#include "tsmppt.h"
 
 #define MAX_DEVICES 100
 
@@ -41,6 +42,10 @@ uint8_t devices_valid[MAX_DEVICES]; // device exists if its index contains 1
 #ifdef FONA_H_
   static const char fona_str[] PROGMEM = FONA_IDENTIFIER_STRING;
 #endif
+#ifdef TSMPPT_H_
+  static const char tsmppt_str[] PROGMEM = TSMPPT_IDENTIFIER_STRING;
+#endif
+
 
 // type i points to a corresponding string
 static PGM_P type_num_to_string_map[MAX_DEVICES] = {
@@ -59,6 +64,9 @@ static PGM_P type_num_to_string_map[MAX_DEVICES] = {
 #ifdef FONA_H_
   fona_str,
 #endif
+#ifdef TSMPPT_H_
+  tsmppt_str,
+#endif
 };
 // type i points to a corresponding creation function
 static NEW_DEVICE_FUNC_TYPE type_num_to_create_function_map [MAX_DEVICES] = {
@@ -76,6 +84,9 @@ static NEW_DEVICE_FUNC_TYPE type_num_to_create_function_map [MAX_DEVICES] = {
 #endif
 #ifdef FONA_H_
   &new_fona,
+#endif
+#ifdef TSMPPT_H_
+  &new_tsmppt,
 #endif
 };
 // port map
@@ -161,6 +172,10 @@ int main(void){
 
   // FIXME: the fona hardcoding begins
   uint8_t fona_pin_count = 3;
+  // FIXME: these pins are incorrect since FONA uses UART3 now but it doesn't
+  // really matter since the pins are handled in a different way. re-designs
+  // needed
+
   // PD2 = RX1, PD3 = TX1, PB3 = connect to RST
   uint8_t fona_ports[] = {3, 3, 1};
   uint8_t fona_bits[] = {2, 3, 3};
@@ -170,10 +185,17 @@ int main(void){
   uint8_t hum_ports[] = {3, 3};
   uint8_t hum_bits[] = {0, 1};
 
+  uint8_t tsmppt_pin_count = 2;
+  // PD2 = RX1, PD3 = TX1
+  uint8_t tsmppt_ports[] = {3, 3};
+  uint8_t tsmppt_bits[] = {2, 3};
+
   create_device(resolve_type_string_to_num(FONA_IDENTIFIER_STRING), fona_ports,
       fona_bits, fona_pin_count);
   create_device(resolve_type_string_to_num(HUMIDITY_SENSOR_IDENTIFIER_STRING),
       hum_ports, hum_bits, hum_pin_count);
+  create_device(resolve_type_string_to_num(TSMPPT_IDENTIFIER_STRING),
+      tsmppt_ports, tsmppt_bits, tsmppt_pin_count);
 
   char fona_read[256];
   char fona_write[256];

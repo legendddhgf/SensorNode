@@ -2,6 +2,7 @@
 #define TSMPPT_H_
 
 #include <string.h>
+#include <stdint.h>
 #include "module.h"
 
 #ifndef TSMPPT_MAX

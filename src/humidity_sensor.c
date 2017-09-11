@@ -72,7 +72,7 @@ void humidity_sensor_read(Humidity_Sensor h, char *read_data, uint16_t max_bytes
       hum / 10, hum % 10, // hum / 10 first, then last digit goes after '.'
       ret[4] & 0x80 ? "-" : "", // handle the sign (if leading is set, then neg)
       (temp & 0x7f) / 10, temp % 10); // same as humidity except don't count b15
-  snprintf(read_data, max_bytes, "%d.%d %%RH\r\n", hum / 10, hum % 10);
+  snprintf(read_data, max_bytes, "%d.%d\r\n", hum / 10, hum % 10);
 }
 
 void humidity_sensor_destroy(Humidity_Sensor h) {
