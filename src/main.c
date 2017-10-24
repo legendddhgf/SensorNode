@@ -190,12 +190,27 @@ int main(void){
   uint8_t tsmppt_ports[] = {3, 3};
   uint8_t tsmppt_bits[] = {2, 3};
 
+  uint8_t light_pin_count = 2;
+  // PD0 = SCL, PD1 = SDA
+  uint8_t light_ports[] = {3, 3};
+  uint8_t light_bits[] = {0, 1};
+
+  uint8_t onewire_pin_count = 1;
+  // PA7 = data
+  uint8_t onewire_ports[] = {0};
+  uint8_t onewire_bits[] = {7};
+
+
   create_device(resolve_type_string_to_num(FONA_IDENTIFIER_STRING), fona_ports,
       fona_bits, fona_pin_count);
   create_device(resolve_type_string_to_num(HUMIDITY_SENSOR_IDENTIFIER_STRING),
       hum_ports, hum_bits, hum_pin_count);
   create_device(resolve_type_string_to_num(TSMPPT_IDENTIFIER_STRING),
       tsmppt_ports, tsmppt_bits, tsmppt_pin_count);
+  create_device(resolve_type_string_to_num(LIGHT_SENSOR_IDENTIFIER_STRING),
+      light_ports, light_bits, light_pin_count);
+  create_device(resolve_type_string_to_num(TEMP_SENSOR_IDENTIFIER_STRING),
+      onewire_ports, onewire_bits, onewire_pin_count);
 
   char fona_read[256];
   char fona_write[256];
