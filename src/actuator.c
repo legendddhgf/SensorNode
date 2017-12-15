@@ -43,12 +43,12 @@ void actuator_write(Actuator a, char *str, uint16_t max_bytes) {
   }
   if (str[0] == '0') { // reversed because of new wiring scheme
     *a.port[0] |= _BV(a.reg_bit[0]);
-    strncpy(str, "OFF\r\n", 6);
+    sprintf(str, "OFF\r\n");
   } else if (str[0] == '1') {
     *a.port[0] &= ~_BV(a.reg_bit[0]);
-    strncpy(str, "ON\r\n", 5);
+    sprintf(str, "ON\r\n");
   } else {
-    strncpy(str, "INVALID\r\n", 10);
+    sprintf(str, "INVALID, given value of %d instead\r\n", (int) str[0]);
   }
   uart_printf(str);
 }

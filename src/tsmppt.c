@@ -77,6 +77,7 @@ void tsmppt_read(Tsmppt t, char *data, uint16_t max_size) {
     buf[i] = (char) uart1_getc();
     if (buf[i] == '\0') {
       uart_puts_P(PSTR("Unable to read expected 12 bytes of data\r\n"));
+      snprintf(data, max_size, "%d", (uint8_t) ~0); // copy data to be sent off
       return;
     }
     uart_printf("Got byte from morningstar with value: %d\n", (int8_t) buf[i]);

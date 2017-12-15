@@ -311,7 +311,7 @@ void light_sensor_read(Light_Sensor ls, char *read_data, uint16_t max_bytes) {
 
   // Signal I2C had no errors
   uart_printf("Light reading is %lu lx\r\n", lux);
-  snprintf(read_data, max_bytes, "%lu lx\r\n", lux);
+  snprintf(read_data, max_bytes, "%lu\r\n", lux);
 
   // END ARDUINO LIBRARY CODE //
 }

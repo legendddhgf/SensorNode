@@ -196,10 +196,14 @@ int main(void){
   uint8_t light_bits[] = {0, 1};
 
   uint8_t onewire_pin_count = 1;
-  // PA7 = data
-  uint8_t onewire_ports[] = {0};
-  uint8_t onewire_bits[] = {7};
+  // PC6 = data
+  uint8_t onewire_ports[] = {2};
+  uint8_t onewire_bits[] = {6};
 
+  uint8_t actuator_pin_count = 1;
+  // PE4 = switch for relay1 = PIN 2
+  uint8_t actuator_ports[] = {4};
+  uint8_t actuator_bits[] = {4};
 
   create_device(resolve_type_string_to_num(FONA_IDENTIFIER_STRING), fona_ports,
       fona_bits, fona_pin_count);
@@ -211,6 +215,12 @@ int main(void){
       light_ports, light_bits, light_pin_count);
   create_device(resolve_type_string_to_num(TEMP_SENSOR_IDENTIFIER_STRING),
       onewire_ports, onewire_bits, onewire_pin_count);
+  create_device(resolve_type_string_to_num(ACTUATOR_IDENTIFIER_STRING),
+      actuator_ports, actuator_bits, actuator_pin_count);
+  // clear the actuator on init
+  // note 1 is off, 0 is on
+  devices[devices_count - 1].write(devices[devices_count - 1], "1", 255);
+
 
   char fona_read[256];
   char fona_write[256];
@@ -248,6 +258,26 @@ int main(void){
     //uart_printf("read data: %s\r\nAttempting to send to fona...\r\n", fona_write);
     devices[0].write(devices[0], fona_write, 255);
     //uart_flushTX();
+
+    // TODO: even worse hardcoding for the relay
+    if (p.device_index == 4) {
+      strtok(fona_write, "=");
+      char *tempshouldbe = strtok(NULL, "=\r\n");
+      float temp = atof(tempshouldbe); // only the numbers
+      uart_printf("temp should be %s but is %f\n", tempshouldbe, temp);
+      // assumes relay switch is device 5 (6th device)
+      char actuate[2];
+      if (temp > 24) {
+        actuate[0] = '0';
+        devices[5].write(devices[5], actuate, 2);
+        uart_printf("triggering relay\n");
+      } else {
+        actuate[0] = '1';
+        devices[5].write(devices[5], actuate, 2);
+        uart_printf("Relay not triggering\n");
+      }
+    }
+    // TODO: end the hardcoding please
   }
 
   // FIXME: THE fona hardcoding ends
@@ -297,7 +327,7 @@ int main(void){
           }
           // FIXME: currently reads nothing
           devices[p.device_index].read(devices[p.device_index], data, 255);
-          uart_printf("read data; %s\r\n", data);
+          uart_printf("read data: %s\r\n", data);
           break;
         case CHAR_WRITE:
           if (p.device_index >= MAX_DEVICES ||
