@@ -474,7 +474,7 @@ void temp_sensor_init(Temp_Sensor t) {
 }
 
 void temp_sensor_read(Temp_Sensor t, char *read_data, uint16_t max_bytes) {
-  float tempC = getTemperatureC(t);
-  uart_printf("Temperature = %f\r\n", tempC);
-  snprintf(read_data, max_bytes, "%f\r\n", tempC);
+  double tempC = (double) getTemperatureC(t);
+  uart_printf("Temperature = %lf\r\n", tempC);
+  snprintf(read_data, max_bytes, "%lf\r\n", tempC);
 }

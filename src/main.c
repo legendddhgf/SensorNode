@@ -221,6 +221,7 @@ int main(void){
   // note 1 is off, 0 is on
   devices[devices_count - 1].write(devices[devices_count - 1], "1", 255);
 
+  /*
 
   char fona_read[256];
   char fona_write[256];
@@ -281,6 +282,7 @@ int main(void){
   }
 
   // FIXME: THE fona hardcoding ends
+  */
 
   while (1) {
 
