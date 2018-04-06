@@ -67,8 +67,8 @@ void tsmppt_read(Tsmppt t, char *data, uint16_t max_size) {
       ONEBYTE, VOLTAGE_SCALE_HI_ADDRESS);
   uint16_t crc = CRC16((uint8_t *) buf, 8); // 8 hex digits up till now (remember reversed)
   // place the crc as two bytes at the end of message (already low, hi order)
-  sprintf(buf, "%02X%02X%04X%04X%c%c", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
-      VOLTAGE_SCALE_HI_ADDRESS, ONEBYTE, ((crc >> 8) & 0xFF), (crc & 0xFF));
+  sprintf(buf, "%02X%02X%04X%04X%02X", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
+      VOLTAGE_SCALE_HI_ADDRESS, ONEBYTE, crc);
   uart1_printf(buf);
 
   // GET PACKET WITH HIGH BYTE OF VOLTAGE SCALE
