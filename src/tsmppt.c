@@ -7,12 +7,11 @@
 
 #define FC_READ_HOLDING_REG 0x3 // 2 hex
 
-#define VOLTAGE_SCALE_HI_ADDRESS 0x0 // 4 hex chars
-#define VOLTAGE_SCALE_LO_ADDRESS 0x1 // 4 hex chars
-#define BATTERY_VOLTAGE_ADDRESS 0x18 // 4 hex chars
-
+//data field is 8 bits as specified by tristar modbus document
+#define VOLTAGE_SCALE_ADDRESS 0x1 // 4 hex chars
+#define BATTERY_VOLTAGE_ADDRESS_FILTER 0x18 // 4 hex chars (Slow Filter)
+#define BATTERY_VOLTAGE_ADDRESS_TERMINAL 0x12 //4 hex chars (Terminal)
 #define ONEBYTE 1
-
 // returns 16 CRC with low byte then high byte
 uint16_t CRC16(uint8_t *buf, uint16_t len)
 {
@@ -64,11 +63,11 @@ void tsmppt_read(Tsmppt t, char *data, uint16_t max_size) {
   // SEND PACKET REQUESTING HIGH BYTE OF VOLTAGE SCALE
   _delay_ms(4); // delay time for approximately 4 characters at this setting
   sprintf(buf, "%02X%02X%04X%04X", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
-      ONEBYTE, VOLTAGE_SCALE_HI_ADDRESS);
+      VOLTAGE_SCALE_ADDRESS, ONEBYTE);
   uint16_t crc = CRC16((uint8_t *) buf, 8); // 8 hex digits up till now (remember reversed)
   // place the crc as two bytes at the end of message (already low, hi order)
-  sprintf(buf, "%02X%02X%04X%04X%02X", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
-      VOLTAGE_SCALE_HI_ADDRESS, ONEBYTE, crc);
+  sprintf(buf, "%02X%02X%04X%04X%04X", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
+      VOLTAGE_SCALE_ADDRESS, ONEBYTE, crc);
   uart1_printf(buf);
 
   // GET PACKET WITH HIGH BYTE OF VOLTAGE SCALE
