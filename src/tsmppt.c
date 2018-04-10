@@ -3,12 +3,12 @@
 #include "uart.h"
 
 // TODO: configure this modbus ID for the charge controller
-#define DEVICE_ADDRESS 0xA // 2 hex chars
+#define DEVICE_ADDRESS 0x0A // 2 hex chars
 
-#define FC_READ_HOLDING_REG 0x3 // 2 hex
+#define FC_READ_HOLDING_REG 0x03 // 2 hex
 
 //data field is 8 bits as specified by tristar modbus document
-#define VOLTAGE_SCALE_ADDRESS 0x1 // 4 hex chars
+#define VOLTAGE_SCALE_ADDRESS 0x01 // 4 hex chars
 #define BATTERY_VOLTAGE_ADDRESS_FILTER 0x18 // 4 hex chars (Slow Filter)
 #define BATTERY_VOLTAGE_ADDRESS_TERMINAL 0x12 //4 hex chars (Terminal)
 #define ONEBYTE 1
@@ -66,11 +66,14 @@ void tsmppt_read(Tsmppt t, char *data, uint16_t max_size) {
       VOLTAGE_SCALE_ADDRESS, ONEBYTE);
   uint16_t crc = CRC16((uint8_t *) bufQuery, 8); // 8 hex digits up till now (remember reversed)
   // place the crc as two bytes at the end of message (already low, hi order)
-  sprintf(bufQuery, "%X%X%X%X%X%X", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
-      VOLTAGE_SCALE_ADDRESS, ONEBYTE, (crc >> 8) & 0xFF, crc & 0xFF);
-  uart_printf("Packet before take-off: %s\r\n",bufQuery);
-  uart_printf("Device Address: %X, Read cmd: %X, Scaler Address: %X,  onebyte:%X crchi: %X, crclow: %X\r\n", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
-    VOLTAGE_SCALE_ADDRESS, ONEBYTE,(crc >> 8) & 0xFF, crc & 0xFF );
+  sprintf(bufQuery, "%02X%02X%04X%04X%c%c", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
+      VOLTAGE_SCALE_ADDRESS, ONEBYTE, (crc >> 8) & 0xFF, crc);
+  //uart_printf("Packet before take-off: %s\r\n",bufQuery);
+  //uart_printf("Device Address: %X, Read cmd: %X, Scaler Address:%X",
+  //    DEVICE_ADDRESS, FC_READ_HOLDING_REG, VOLTAGE_SCALE_ADDRESS);
+  //uart_flushTX();
+  //uart_printf("onebyte:%X crchi: %X, crclow: %X\r\n", ONEBYTE,
+  //    (crc >> 8) & 0xFF, crc & 0xFF );
   uart1_printf(bufQuery);
 
   // GET PACKET WITH HIGH BYTE OF VOLTAGE SCALE
@@ -83,7 +86,7 @@ void tsmppt_read(Tsmppt t, char *data, uint16_t max_size) {
       return;
     }
     uart_printf("Got byte from morningstar with value: %d\n", (int8_t)
-        bufResponse[i]);
+        bufQuery[i]);
   }
   bufQuery[255] = '\0'; // end string
 

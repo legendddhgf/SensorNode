@@ -169,7 +169,7 @@ int main(void){
 
   unsigned char cmd[TX_BUF_SIZE + 1]; // max amount written by uart_ngetc()
   uint16_t cmd_index = 0;
-
+/*
   // FIXME: the fona hardcoding begins
   uint8_t fona_pin_count = 3;
   // FIXME: these pins are incorrect since FONA uses UART3 now but it doesn't
@@ -184,12 +184,13 @@ int main(void){
   // PD0 = SCL, PD1 = SDA
   uint8_t hum_ports[] = {3, 3};
   uint8_t hum_bits[] = {0, 1};
-
+*/
   uint8_t tsmppt_pin_count = 2;
+
   // PD2 = RX1, PD3 = TX1
   uint8_t tsmppt_ports[] = {3, 3};
   uint8_t tsmppt_bits[] = {2, 3};
-
+/*
   uint8_t light_pin_count = 2;
   // PD0 = SCL, PD1 = SDA
   uint8_t light_ports[] = {3, 3};
@@ -204,19 +205,19 @@ int main(void){
   // PE4 = switch for relay1 = PIN 2
   uint8_t actuator_ports[] = {4};
   uint8_t actuator_bits[] = {4};
-
-  create_device(resolve_type_string_to_num(FONA_IDENTIFIER_STRING), fona_ports,
-      fona_bits, fona_pin_count);
-  create_device(resolve_type_string_to_num(HUMIDITY_SENSOR_IDENTIFIER_STRING),
-      hum_ports, hum_bits, hum_pin_count);
+*/
+ // create_device(resolve_type_string_to_num(FONA_IDENTIFIER_STRING), fona_ports,
+ //     fona_bits, fona_pin_count);
+ // create_device(resolve_type_string_to_num(HUMIDITY_SENSOR_IDENTIFIER_STRING),
+ //     hum_ports, hum_bits, hum_pin_count);
   create_device(resolve_type_string_to_num(TSMPPT_IDENTIFIER_STRING),
       tsmppt_ports, tsmppt_bits, tsmppt_pin_count);
-  create_device(resolve_type_string_to_num(LIGHT_SENSOR_IDENTIFIER_STRING),
-      light_ports, light_bits, light_pin_count);
-  create_device(resolve_type_string_to_num(TEMP_SENSOR_IDENTIFIER_STRING),
-      onewire_ports, onewire_bits, onewire_pin_count);
-  create_device(resolve_type_string_to_num(ACTUATOR_IDENTIFIER_STRING),
-      actuator_ports, actuator_bits, actuator_pin_count);
+ // create_device(resolve_type_string_to_num(LIGHT_SENSOR_IDENTIFIER_STRING),
+ //     light_ports, light_bits, light_pin_count);
+ // create_device(resolve_type_string_to_num(TEMP_SENSOR_IDENTIFIER_STRING),
+ //     onewire_ports, onewire_bits, onewire_pin_count);
+ // create_device(resolve_type_string_to_num(ACTUATOR_IDENTIFIER_STRING),
+ //     actuator_ports, actuator_bits, actuator_pin_count);
   // clear the actuator on init
   // note 1 is off, 0 is on
   devices[devices_count - 1].write(devices[devices_count - 1], "1", 255);

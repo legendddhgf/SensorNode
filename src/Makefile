@@ -1,6 +1,6 @@
 PROGRAMMER=avrdude
 LINPORT=/dev/ttyACM0
-LINPORT=/dev/ttyS0 #working on vbox
+#LINPORT=/dev/ttyS0 #working on vbox
 MACPORT=/dev/tty.usbmodem1421
 WINPORT=COM3
 CC=avr-gcc
@@ -41,7 +41,7 @@ CFLAGS+=-O$(OPT)
 LDFLAGS+=-O$(OPT)
 
 MODULES = main parser uart module actuator OneWire fona current_sensor
-MODULES += twimaster humidity_sensor light_sensor can_bus tsmppt extra_util
+MODULES += twimaster can_bus tsmppt extra_util humidity_sensor light_sensor
 OBJECTS = $(MODULES:%=%.o)
 
 ######## OS Detection #########
