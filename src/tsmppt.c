@@ -8,11 +8,14 @@
 #define FC_READ_HOLDING_REG 0x03 // 2 hex
 
 //data field is 8 bits as specified by tristar modbus document
-#define VOLTAGE_SCALE_ADDRESS 0x01 // 4 hex chars
+#define VOLTAGE_SCALE_ADDRESS_LO 0x00
+#define VOLTAGE_SCALE_ADDRESS_HI 0x01 // 4 hex chars
 #define BATTERY_VOLTAGE_ADDRESS_FILTER 0x18 // 4 hex chars (Slow Filter)
-#define BATTERY_VOLTAGE_ADDRESS_TERMINAL 0x12 //4 hex chars (Terminal)
+#define Vp12_ADDRESS 0x1E
+#define SOLAR_INPUT_VOLTAGE_ADDRESS 0x1B
 #define ONEBYTE 1
 // returns 16 CRC with low byte then high byte
+static uint8_t readCmdCount = 0;
 uint16_t CRC16(uint8_t *buf, uint16_t len)
 {
   uint16_t crc = 0xFFFF;
@@ -54,28 +57,67 @@ void tsmppt_init(Tsmppt t) {
 }
 
 void tsmppt_read(Tsmppt t, char *data, uint16_t max_size) {
+  uart_printf("\r\nRead Command #:%d\r\n",readCmdCount++);
   // TODO: send a packet with ID | FC | data | CRC (get algorithm)
   // TODO: what kinds of data do we want from the charge controller?
   if (0 && t.type_num && data && max_size) {} // no compiler warnings
 
   char bufQuery[256] = {};
   char bufResponse[256] = {};
+  uint8_t crc;
   // SEND PACKET REQUESTING HIGH BYTE OF VOLTAGE SCALE
-  _delay_ms(4); // delay time for approximately 4 characters at this setting
-  sprintf(bufQuery, "%02X%02X%04X%04X", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
-      VOLTAGE_SCALE_ADDRESS, ONEBYTE);
-  uint16_t crc = CRC16((uint8_t *) bufQuery, 8); // 8 hex digits up till now (remember reversed)
-  // place the crc as two bytes at the end of message (already low, hi order)
-  sprintf(bufQuery, "%02X%02X%04X%04X%c%c", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
-      VOLTAGE_SCALE_ADDRESS, ONEBYTE, (crc >> 8) & 0xFF, crc);
-  //uart_printf("Packet before take-off: %s\r\n",bufQuery);
-  //uart_printf("Device Address: %X, Read cmd: %X, Scaler Address:%X",
-  //    DEVICE_ADDRESS, FC_READ_HOLDING_REG, VOLTAGE_SCALE_ADDRESS);
-  //uart_flushTX();
-  //uart_printf("onebyte:%X crchi: %X, crclow: %X\r\n", ONEBYTE,
-  //    (crc >> 8) & 0xFF, crc & 0xFF );
-  uart1_printf(bufQuery);
-
+  switch(readCmdCount){
+    case 0:
+      _delay_ms(4); // delay time for approximately 4 characters at this setting
+      sprintf(bufQuery, "%02X%02X%04X%04X", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
+      VOLTAGE_SCALE_ADDRESS_LO, ONEBYTE);
+      crc = CRC16((uint8_t *) bufQuery, 8); // 8 hex digits up till now (remember reversed)
+      // place the crc as two bytes at the end of message (already low, hi order)
+      sprintf(bufQuery, "%02X%02X%04X%04X%c%c", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
+          VOLTAGE_SCALE_ADDRESS_LO, ONEBYTE, (crc >> 8) & 0xFF, crc);
+      uart1_printf(bufQuery);
+      //uart_printf("Packet before take-off: %s\r\n",bufQuery);
+      //uart_printf("Device Address: %X, Read cmd: %X, Scaler Address:%X",
+      //    DEVICE_ADDRESS, FC_READ_HOLDING_REG, VOLTAGE_SCALE_ADDRESS);
+      //uart_flushTX();
+      //uart_printf("onebyte:%X crchi: %X, crclow: %X\r\n", ONEBYTE,
+      //    (crc >> 8) & 0xFF, crc & 0xFF );
+      //uart1_printf(bufQuery);
+      break;
+    case 1:
+      _delay_ms(4); // delay time for approximately 4 characters at this setting
+      sprintf(bufQuery, "%02X%02X%04X%04X", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
+      VOLTAGE_SCALE_ADDRESS_HI, ONEBYTE);
+      crc = CRC16((uint8_t *) bufQuery, 8); // 8 hex digits up till now (remember reversed)
+      // place the crc as two bytes at the end of message (already low, hi order)
+      sprintf(bufQuery, "%02X%02X%04X%04X%c%c", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
+          VOLTAGE_SCALE_ADDRESS_HI, ONEBYTE, (crc >> 8) & 0xFF, crc);
+      uart1_printf(bufQuery);
+      break;
+    case 2:
+      _delay_ms(4); // delay time for approximately 4 characters at this setting
+      sprintf(bufQuery, "%02X%02X%04X%04X", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
+      Vp12_ADDRESS, ONEBYTE);
+      crc = CRC16((uint8_t *) bufQuery, 8); // 8 hex digits up till now (remember reversed)
+      // place the crc as two bytes at the end of message (already low, hi order)
+      sprintf(bufQuery, "%02X%02X%04X%04X%c%c", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
+      Vp12_ADDRESS, ONEBYTE, (crc >> 8) & 0xFF, crc);
+      uart1_printf(bufQuery);
+      break;
+    case 3:
+      _delay_ms(4); // delay time for approximately 4 characters at this setting
+        sprintf(bufQuery, "%02X%02X%04X%04X", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
+      SOLAR_INPUT_VOLTAGE_ADDRESS, ONEBYTE);
+        crc = CRC16((uint8_t *) bufQuery, 8); // 8 hex digits up till now (remember reversed)
+      // place the crc as two bytes at the end of message (already low, hi order)
+      sprintf(bufQuery, "%02X%02X%04X%04X%c%c", DEVICE_ADDRESS, FC_READ_HOLDING_REG,
+          SOLAR_INPUT_VOLTAGE_ADDRESS, ONEBYTE, (crc >> 8) & 0xFF, crc);
+      uart1_printf(bufQuery);
+      break;
+    default:
+      uart_printf("hit default");
+  }
+  if(readCmdCount == 4) readCmdCount = 0;
   // GET PACKET WITH HIGH BYTE OF VOLTAGE SCALE
   _delay_ms(4); // delay time for approximately 4 characters at this setting
   for (uint8_t i = 0; i < 255; i++) {
@@ -89,12 +131,11 @@ void tsmppt_read(Tsmppt t, char *data, uint16_t max_size) {
         bufQuery[i]);
   }
   bufQuery[255] = '\0'; // end string
-
   uart_puts_P(PSTR("Read some data:\r\n"));
   uart_printf("size = %zd: %s\r\n", strlen(bufResponse), bufResponse);
   uart_puts_P(PSTR("\r\n"));
   snprintf(data, max_size, bufResponse); // copy data to be sent off
-}
+  }
 
 void tsmppt_destroy(Tsmppt t) {
   if (0 && t.type_num) {} // no compiler warnings
